@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="folders/js/jquery-3.4.1.js"></script>
+    <script src="folders/js/jquery.mask.js"></script>
+    <script src="folders/js/sweetalert.min.js"></script>
+    <script src="folders/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="folders/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <title>js</title>
+</head>
+<body style="background-color: rgba(117,127,187,0.31)"><br>
+<div  style="margin-left: 20px">
+    <div class="input-group col-lg-6" >
+        <span class="input-group-addon glyphicon glyphicon glyphicon-user" ></span>
+        <input type="text" autocomplete="off" style="font:20px Centaur" class="form-control glyphicon" placeholder="Full Name" id="full_name" >
+    </div><br>
+    <div class="input-group col-lg-6" >
+        <span class="input-group-addon glyphicon glyphicon glyphicon-education" ></span>
+        <input type="text" autocomplete="off" class="form-control glyphicon"  placeholder="Group Name" id="group_name">
+    </div><br>
+    <div class="input-group col-lg-6" >
+        <span class="input-group-addon glyphicon glyphicon-earphone" style="margin-bottom: 115px"></span>
+        <input type="text"  autocomplete="off" class="form-control glyphicon" placeholder="(998) 93 758 6632" id="phone">
+    </div><br>
+
+    <button type="button" id="btn" data-toggle="tooltip" data-placement="right" title="Add Students" data-page="table" onclick="addContact()" class="glyphicon glyphicon-floppy-save btn btn-primary btn-lg" ></button>
+</div>
+<br>
+
+
+<!-- Button trigger modal -->
+<button type="button" id="modal" class="hidden btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+    Launch demo modal
+</button>
+
+<!-- Modal -->
+<div style="background-color: rgba(38,34,13,0.77)" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div  class="modal-dialog" role="document">
+        <div style="background-color: rgba(117,127,187,0.57)" class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" style="color:red;">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Update Student info</h4>
+            </div>
+            <div class="modal-body" id="modal_body">
+                <div class="input-group" >
+                    <span class="input-group-addon glyphicon glyphicon glyphicon-user" ></span>
+                    <input type="text" id="updateName" autocomplete="off" style="font:20px Centaur" class="form-control glyphicon" >
+                    <div id="alertName" style="position: absolute;z-index: 3;margin-left: 450px;margin-top: 10px">
+                        <!--<u style="color: red;font: 25px Centaur ">___Maydonni toldiring</u>-->
+                    </div>
+                </div><br>
+                <div class="input-group " >
+                    <span class="input-group-addon glyphicon glyphicon glyphicon-education" ></span>
+                    <input type="text" id="updateGroup" autocomplete="off" class="form-control glyphicon"  >
+                    <div id="alertGroup" style="position: absolute;z-index: 3;margin-left: 450px;margin-top: 10px">
+                        <!--<u style="color: red;font: 25px Centaur ">___Maydonni toldiring</u>-->
+                    </div>
+                </div><br>
+                <div class="input-group " >
+                    <span class="input-group-addon glyphicon glyphicon-earphone" ></span>
+                    <input type="text" id="updatePhone" autocomplete="off" class="form-control glyphicon"  >
+                    <div id="alertPhone" style="position: absolute;z-index: 3;margin-left: 450px;margin-top: 10px">
+                        <!--<u style="color: red;font: 25px Centaur ">___Maydonni toldiring</u>-->
+                    </div>
+                    <input type="text" id="updateId"  class="hidden">
+                </div><br>
+                <div id="alert"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-xs" data-dismiss="modal">Close</button>
+                <button type="button" id="Update" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<table id="students-table" width="50%" style="background-color: rgba(80,79,79,0.57)" class="table table-striped  table-bordered ">
+    <thead>
+    <th>ID</th>
+    <th>Full Name</th>
+    <th>GroupName</th>
+    <th>Phone</th>
+    <th width="10%">Action</th>
+    </thead>
+    <tbody id="table_body">
+
+    </tbody>
+</table>
+
+<script>
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
+
+    /**
+     *press enter in phone
+     */
+    $("input#phone").keypress(function () {
+        if(event.keyCode==13){
+            addContact();
+        }
+    })
+
+    $( "#full_name" ).keypress(function () {
+        $(".glyphicon-user").css( "color", "red" ).delay(1000);
+    })
+    $( "#full_name" ).keyup(function () {
+        $(".glyphicon-user").css( "color", "rgba(0,0,0,0.60)" );
+    })
+
+    $( "#group_name" ).keypress(function () {
+        $(".glyphicon-education").css( "color", "red" ).delay(1000);
+    })
+    $( "#group_name" ).keyup(function () {
+        $(".glyphicon-education").css( "color", "rgba(0,0,0,0.60)" );
+    })
+
+    $( "#phone" ).keypress(function () {
+        $(".glyphicon-earphone").css( "color", "red" ).delay(1000);
+    })
+    $( "#phone" ).keyup(function () {
+        $(".glyphicon-earphone").css( "color", "rgba(0,0,0,0.60)" );
+    })
+
+    $("#phone").mask('(000) 00 000 0000');
+
+    $("#updatePhone").mask('(000) 00 000 0000');
+
+    var Name = $("#full_name");
+    var groupName= $("#group_name");
+    var phone= $("#phone");
+    let contacts = getContacts();
+    var counter = contacts.length;
+
+    //show local
+    function init(){
+        if (contacts.length > 0)
+        {
+            for (var index = 0; index < contacts.length; index++){
+                //Draw row
+                var row =
+                    '<tr>'+
+                    '<td>'+contacts[index].id+'</td>'+
+                    '<td>'+contacts[index].Name+'</td>'+
+                    '<td>'+contacts[index].groupName+'</td>'+
+                    '<td>'+contacts[index].phone+'</td>'+
+                    '<td> <button onclick="deleteContact('+contacts[index].id+')"  class="btn btn-danger glyphicon glyphicon-trash " data-toggle="tooltip" data-placement="left" title="Delete"  ></button>'+
+                    '<button data-id="'+contacts[index].id+'" class="update-btn  btn btn-warning glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="bottom" title="Update"></button>'+
+                    '</td>'+
+                    '</tr>';
+                //Add row to table
+                table_body.innerHTML += row;
+            }
+        }
+    }
+
+    //Get local
+    function getContacts()
+    {
+        var contacts = JSON.parse(localStorage.getItem('contacts'));
+        if (contacts == null)
+            return [];
+        var result = [];
+        for (var index = 0; index < contacts.length; index++)
+        {
+            if(contacts[index] != null) {
+                result.push(contacts[index]);
+                counter = contacts[index].id;
+            }
+        }
+        return result;
+    }
+
+    //Set local
+    function setContacts() {
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+
+    //add students
+    function addContact(){
+        console.log();
+        if(Name.val()!=="" && phone.val()!=="" && groupName.val()!=="") {
+            //Add to contact array
+            contacts.push({
+                id: ++counter,
+                Name: Name.val(),
+                groupName: groupName.val(),
+                phone: phone.val()
+            });
+
+
+            setContacts();
+            //Draw row
+            let index = contacts.length - 1;
+            var row = '<tr>' +
+                '<td>' + contacts[index].id + '</td>' +
+                '<td>' + contacts[index].Name + '</td>' +
+                '<td>' + contacts[index].groupName + '</td>' +
+                '<td>' + contacts[index].phone + '</td>' +
+                '<td> <button data-toggle="tooltip" data-placement="left" title="Delete" onclick="deleteContact(' + contacts[index].id + ')"  class="btn btn-danger glyphicon glyphicon-trash " ></button>' +
+                '<button data-id="'+ contacts[index].id + '" class="update-btn btn btn-warning glyphicon glyphicon-pencil" ></button>' +
+                '</td>' +
+                '</tr>';
+            //Add row to table
+            table_body.innerHTML += row;
+            //Reset input
+            Name.val("");
+            phone.val("");
+            groupName.val("")
+            //Message
+            swal({
+                title: "Good job!",
+                text: "You clicked the button!",
+                icon: "success",
+                button: "Aww yiss!",
+                timer:3000,
+            });
+        }
+        else {
+            swal({
+                title:"Hamma",
+                text: "Maydonlarni to'ldiring",
+                icon: "warning",
+                buttons: false,
+                timer: 2000,
+            });
+        }
+    }
+
+    $('body').on('click', '.update-btn', function () {
+        let id = $(this).data('id');
+        $.each(contacts, function (index, item) {
+           if (item.id == id) {
+               $('#updateName').val(contacts[index].Name);
+               $('#updateGroup').val(contacts[index].groupName);
+               $('#updatePhone').val(contacts[index].phone);
+               $('#updateId').val(contacts[index].id);
+               $("#modal").click();
+           }
+        }.bind(id));
+    });
+
+    //update local
+    $("#Update").click(function () {
+        let id= $("#updateId").val();
+        var name=$("#updateName").val();
+        var group=$("#updateGroup").val();
+        var phone=$("#updatePhone").val();
+        console.log(id);
+        if(name=="" || group=="" || phone==""){
+            /**
+             * modal alerts
+             * name
+             * group
+             * phone
+             */
+            $('#alert').show(function () {
+                $(this).html('<div class="alert alert-danger col-lg-11" role="alert" style="position: absolute">Fill all lots</div>').fadeOut(5000);
+                if(name==""){
+                    $("#updateName").css('border','1px solid red');
+                    $("#alertName").html('<i style="color: red;font: 15px Centaur ">___fill Name</i>');
+                    $("#updateName").keypress(function () {
+                        $("#alertName").html('<i style="color: red;font: 15px Centaur ">___fill Name</i>').fadeOut(2000);
+                        $(this).css('border','1px solid rgba(130,129,129,0.57)');
+                    })
+
+                }
+                if(group==""){
+                    $("#updateGroup").css('border','1px solid red');
+                    $("#alertGroup").html('<i style="color: red;font: 15px Centaur ">___fill Group</i>');
+                    $("#updateGroup").keypress(function () {
+                        $("#alertGroup").html('<i style="color: red;font: 15px Centaur ">___fill Group</i>').fadeOut(2000);
+                        $(this).css('border','1px solid rgba(130,129,129,0.57)');
+                    })
+                }
+                if(phone==""){
+                    $("#updatePhone").css('border','2px solid red');
+                    $("#alertPhone").html('<i style="color: red;font: 15px Centaur ">___fill Phone</i>');
+                    $("#updatePhone").keypress(function () {
+                        $("#alertPhone").html('<i style="color: red;font: 15px Centaur ">___fill Phone</i>').fadeOut(2000);
+                        $(this).css('border','1px solid rgba(130,129,129,0.57)');
+                    })
+                }
+            });
+
+        }
+        else{
+            console.log(id);
+            //         contacts['#updateId'].id=$("#updateId").val();
+                    contacts[id].id=$("#updateId").val();
+                    contacts[id].name=$("#updateName").val();
+                    contacts[id].groupName=$("#updateGroup").val();
+                    contacts[id].phone=$("#updatePhone").val();
+                    // alert("dfsd");
+            setContacts();
+        }
+    });
+
+
+
+    function eleteContact(id){
+        console.log(id);
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this imaginary file!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal("Poof! Your imaginary file has been deleted!", {
+                        icon: "success",
+                    });
+                    table_body.innerHTML = '';
+                    for (var index = 0; index < contacts.length; index++){
+                        if(contacts[index] != null && contacts[index].id != id){
+                            console.log(id);
+                            var row = '<tr>'+
+                                '<td>'+contacts[index].id+'</td>'+
+                                '<td>'+contacts[index].Name+'</td>'+
+                                '<td>'+contacts[index].groupName+'</td>'+
+                                '<td>'+contacts[index].phone+'</td>'+
+                                '<td> <button onclick="deleteContact('+contacts[index].id+')"  class="btn btn-danger glyphicon glyphicon-trash " data-toggle="tooltip" data-placement="left" title="Delete" ></button>'+
+                                '<button data-id="'+contacts[index].id+'"  class="update-btn  btn btn-warning glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="bottom" title="Update"></button>'+
+                                '</td>'+
+                                '</tr>';
+                            //Add row to table
+                            table_body.innerHTML += row;
+                        }
+                        else {
+                            delete contacts[index];
+                        }
+                        setContacts();
+                    }
+                } else {
+                    swal("Your imaginary file is safe!");
+                }
+            });
+
+
+
+
+    }
+    init();
+</script>
+</body>
+</html>

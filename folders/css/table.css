@@ -1,0 +1,96 @@
+body {
+    background-color: #efefef;
+    align-items: center;
+    color: #333;
+    font-family: "Roboto";
+    font-weight: 400;
+    margin: 0;
+}
+
+.container {
+    margin: 5% auto 0;
+    width: 70vw;
+}
+
+a,
+a:hover,
+a:focus,
+a:active {
+    color: #333;
+    outline: medium none;
+    text-decoration: none;
+}
+
+.btn.active.focus,
+.btn.active:focus,
+.btn.focus,
+.btn.focus:active,
+.btn:active:focus,
+.btn:focus {
+    outline: medium none;
+}
+
+#ribbon {
+    background: #fff none repeat scroll 0 0;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    font-weight: 400;
+    padding: 15px;
+    position: fixed;
+    right: -269px;
+    text-align: center;
+    top: -125px;
+    transform: rotate(45deg);
+    transform-origin: 0 0 0;
+    width: 500px;
+}
+
+#ribbon i {
+    font-size: 21px;
+    padding-right: 5px;
+    vertical-align: middle;
+}
+
+.dataTable-sorter::before {
+    bottom: 8px;
+}
+.dataTable-sorter::after {
+    top: 8px;
+}
+
+.dataTable-wrapper {
+    position: relative;
+}
+
+.dataTable-loading {
+    min-height: 420px;
+}
+
+.dataTable-loading::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #999 #ccc #ccc #ccc;
+
+    transform: rotate(0deg) translate3d(-50%, -50%, 0);
+    transform-origin: 0 0;
+
+    animation-name: spin;
+    animation-duration: 500ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg) translate3d(-50%, -50%, 0);
+    }
+    to {
+        transform: rotate(360deg) translate3d(-50%, -50%, 0);
+    }
+}

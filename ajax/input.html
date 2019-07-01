@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="../folders/js/jquery-3.4.1.js"></script>
+    <script src="../folders/js/jquery.mask.js"></script>
+    <script src="../folders/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../folders/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <title>js</title>
+</head>
+<body><br>
+    <div  style="margin-left: 20px">
+        <div class="input-group col-lg-6" >
+            <span class="input-group-addon glyphicon glyphicon glyphicon-user" ></span>
+            <input type="text" autocomplete="off" class="form-control glyphicon" placeholder="Full Name" id="full_name" >
+        </div><br>
+        <div class="input-group col-lg-6" >
+            <span class="input-group-addon glyphicon glyphicon glyphicon-education" ></span>
+            <input type="text" autocomplete="off" class="form-control glyphicon"  placeholder="Group Name" id="group_name">
+        </div><br>
+        <div class="input-group col-lg-6" >
+            <span class="input-group-addon glyphicon glyphicon-earphone" style="margin-bottom: 115px"></span>
+            <input type="text"  autocomplete="off" class="form-control glyphicon" placeholder="+99893758663" id="phone">
+        </div><br>
+
+        <button type="button" id="btn" onclick="addContact()" class="glyphicon glyphicon-floppy-save btn btn-primary btn-lg" ></button>
+    </div>
+    <br>
+    <div id="#tableBody"></div>
+    <script>
+        function loadPage() {
+            $.ajax({
+                url: 'tableBody.php',
+                type: 'GET',
+                dataType: 'html',
+                success: function (data) {
+
+                }
+            });
+        }
+        //Default page
+        loadPage();
+
+
+
+
+
+
+        // $(".input-group-addon").css.color("red");
+        $( ".input-group" ).keypress(function () {
+            $(".input-group-addon").css( "color", "red" ).delay(1000);
+        })
+        $( ".input-group" ).keyup(function () {
+            $(".input-group-addon").css( "color", "black" );
+        })
+        $("#phone").mask('(000) 00 000 0000')
+        var Name = $("#full_name");
+        var groupName= $("#group_name");
+        var phone= $("#phone");
+        var contacts = getContacts();
+        var counter = contacts.length;
+
+        $('#btn').click(function () {
+            console.log(Name.val());
+            console.log(groupName.val());
+            console.log(phone.val());
+        })
+        //Init
+        $('tbody#btn-danger .delete' ).click(function(){
+            // console.log($(this).val());
+            // $(this).data('id', 'changedValue');
+            $(this).closest('tr').remove();
+        });
+        function init(){
+            if (contacts.length > 0)
+            {
+                for (var index = 0; index < contacts.length; index++){
+                    //Draw row
+                    var row =
+                        '<tr>'+
+                        '<td>'+contacts[index].id+'</td>'+
+                        '<td>'+contacts[index].Name+'</td>'+
+                        '<td>'+contacts[index].groupName+'</td>'+
+                        '<td>'+contacts[index].phone+'</td>'+
+                        '<td> <button onclick="deleteContact('+contacts[index].id+')"  class="btn btn-danger glyphicon glyphicon-trash " ></button>'+
+                        '<button class="btn btn-warning glyphicon glyphicon-pencil"></button>'+
+                        '</td>'+
+                    '</tr>';
+                    //Add row to table
+                    table_body.innerHTML += row;
+                }
+            }
+        }
+        //Get local
+        function getContacts()
+        {
+            var contacts = JSON.parse(localStorage.getItem('contacts'));
+            if (contacts == null)
+                return [];
+            var result = [];
+            for (var index = 0; index < contacts.length; index++)
+            {
+                if(contacts[index] != null) {
+                    result.push(contacts[index]);
+                    counter = contacts[index].id;
+                }
+            }
+            return result;
+        }
+        //Set local
+        function setContacts() {
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+        }
+        function addContact(){
+            //Add to contact array
+            contacts.push({
+                id: ++counter,
+                Name: Name.val(),
+                groupName:groupName.val(),
+                phone: phone.val()
+            });
+            setContacts();
+            //Draw row
+            let index = contacts.length-1;
+            var row = '<tr>'+
+                '<td>'+contacts[index].id+'</td>'+
+                '<td>'+contacts[index].Name+'</td>'+
+                '<td>'+contacts[index].groupName+'</td>'+
+                '<td>'+contacts[index].phone+'</td>'+
+                '<td> <button onclick="deleteContact('+contacts[index].id+')"  class="btn btn-danger glyphicon glyphicon-trash " ></button>'+
+                '<button class="btn btn-warning glyphicon glyphicon-pencil"></button>'+
+                '</td>'+
+                '</tr>';
+            //Add row to table
+            table_body.innerHTML += row;
+            //Reset input
+            name_contact.value = '';
+            phone.value = '';
+            //Message
+            messageBox('Qo`shildi!');
+        }
+        function deleteContact(id){
+            if(!confirm('O`chirmoqchimisiz?'))
+                return false;
+            table_body.innerHTML = '';
+            for (var index = 0; index < contacts.length; index++){
+                if(contacts[index] != null && contacts[index].id != id){
+                    var row = '<tr>'+
+                        '<td>'+contacts[index].id+'</td>'+
+                        '<td>'+contacts[index].Name+'</td>'+
+                        '<td>'+contacts[index].groupName+'</td>'+
+                        '<td>'+contacts[index].phone+'</td>'+
+                        '<td> <button onclick="deleteContact('+contacts[index].id+')"  class="btn btn-danger glyphicon glyphicon-trash " ></button>'+
+                        '<button class="btn btn-warning glyphicon glyphicon-pencil"></button>'+
+                        '</td>'+
+                        '</tr>';
+                    //Add row to table
+                    table_body.innerHTML += row;
+                }
+                else {
+                    delete contacts[index];
+                }
+            }
+            setContacts();
+            //Message
+            messageBox('O`chirildi!', 'danger');
+        }
+        //MessageBox
+        function messageBox(text, type) {
+            let color = 'green';
+            if(type === 'danger')
+                color = 'red';
+            let box = $('message-box');
+            box.innerText = text ? text : 'Xato';
+            box.css.backgroundColor = color;
+            box.css.display = 'block';
+            setTimeout(function(){
+                $('message-box').css.display = 'none';
+            }, 3000);
+        }
+        init();
+    </script>
+    <style>
+        #message-box {
+            position: absolute;
+            width: 290px;
+            color: #ffffff;
+            font-size: 20px;
+            left: 10px;
+            bottom: 10px;
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+    </style>
+</body>
+</html>

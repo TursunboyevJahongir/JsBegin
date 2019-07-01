@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>4 lesson</title>
+</head>
+<body>
+<input type="text" id="input-phone" placeholder="Phone">
+<input type="text" id="input-name" placeholder="Name">
+<button onclick="addContact()">Add</button>
+<hr>
+<table width="100%" border="1px" cellpadding="0" cellspacing="0">
+    <thead>
+    <th>id</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th width="100px">Action</th>
+    </thead>
+    <tbody id="table_body"></tbody>
+</table>
+<div id="message-box"></div>
+<script>
+    var phone = document.getElementById('input-phone');
+    var name_contact  = document.getElementById('input-name');
+    var table_body = window.document.getElementById('table_body');
+    var contacts = getContacts();
+    var counter = contacts.length;
+    //Init
+    function init(){
+        if (contacts.length > 0)
+        {
+            for (var index = 0; index < contacts.length; index++){
+                //Draw row
+                var row = '<tr>' +
+                    '<td>'+contacts[index].id+'</td>' +
+                    '<td>'+contacts[index].name_contact+'</td>' +
+                    '<td>'+contacts[index].phone+'</td>' +
+                    '<td><button onclick="deleteContact('+contacts[index].id+')">Delete</button></td>' +
+                    '</tr>';
+                //Add row to table
+                table_body.innerHTML += row;
+            }
+        }
+    }
+    //Get local
+    function getContacts()
+    {
+        var contacts = JSON.parse(localStorage.getItem('contacts'));
+        if (contacts == null)
+            return [];
+        var result = [];
+        for (var index = 0; index < contacts.length; index++)
+        {
+            if(contacts[index] != null) {
+                result.push(contacts[index]);
+                counter = contacts[index].id;
+            }
+        }
+        return result;
+    }
+    //Set local
+    function setContacts() {
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+    function addContact(){
+        //Add to contact array
+        contacts.push({
+            id: ++counter,
+            name_contact: name_contact.value,
+            phone: phone.value
+        });
+        setContacts();
+        //Draw row
+        var row = '<tr>' +
+            '<td>'+name_contact.value+'</td>' +
+            '<td>'+phone.value+'</td>' +
+            '<td><button onclick="deleteContact('+counter+')">Delete</button></td>' +
+            '</tr>';
+        //Add row to table
+        table_body.innerHTML += row;
+        //Reset input
+        name_contact.value = '';
+        phone.value = '';
+        //Message
+        messageBox('Qo`shildi!');
+    }
+    function deleteContact(id){
+        if(!confirm('O`chirmoqchimisiz?'))
+            return false;
+        table_body.innerHTML = '';
+        for (var index = 0; index < contacts.length; index++){
+            if(contacts[index] != null && contacts[index].id != id){
+                var row = '<tr>' +
+                    '<td>'+contacts[index].id+'</td>' +
+                    '<td>'+contacts[index].name_contact+'</td>' +
+                    '<td>'+contacts[index].phone+'</td>' +
+                    '<td><button onclick="deleteContact('+contacts[index].id+')">Delete</button></td>' +
+                    '</tr>';
+                //Add row to table
+                table_body.innerHTML += row;
+            }
+            else {
+                delete contacts[index];
+            }
+        }
+        setContacts();
+        //Message
+        messageBox('O`chirildi!', 'danger');
+    }
+    //MessageBox
+    function messageBox(text, type) {
+        var color = 'green';
+        if(type == 'danger')
+            color = 'red';
+        var box = document.getElementById('message-box');
+        box.innerText = text;
+        box.style.backgroundColor = color;
+        box.style.display = 'block';
+        setTimeout(function(){
+            document.getElementById('message-box').style.display = 'none';
+        }, 3000);
+    }
+    init();
+</script>
+<style>
+    #message-box {
+        position: absolute;
+        width: 290px;
+        color: #ffffff;
+        font-size: 20px;
+        left: 10px;
+        bottom: 10px;
+        text-align: center;
+        padding: 20px;
+        display: none;
+    }
+</style>
+</body>
+</html>
