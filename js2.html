@@ -132,19 +132,19 @@
 
     $("#updatePhone").mask('(000) 00 000 0000');
 
-    var Name = $("#full_name");
-    var groupName= $("#group_name");
-    var phone= $("#phone");
+    let Name = $("#full_name");
+    let groupName= $("#group_name");
+    let phone= $("#phone");
+    let counter = 0;
     let contacts = getContacts();
-    var counter = contacts.length;
-
+    counter = contacts.length;
     //show local
     function init(){
         if (contacts.length > 0)
         {
-            for (var index = 0; index < contacts.length; index++){
+            for (let index = 0; index < contacts.length; index++){
                 //Draw row
-                var row =
+                let row =
                     '<tr>'+
                     '<td>'+contacts[index].id+'</td>'+
                     '<td>'+contacts[index].Name+'</td>'+
@@ -163,11 +163,12 @@
     //Get local
     function getContacts()
     {
-        var contacts = JSON.parse(localStorage.getItem('contacts'));
-        if (contacts == null)
+        let contacts = JSON.parse(localStorage.getItem('contacts'));
+        if (contacts === null)
             return [];
-        var result = [];
-        for (var index = 0; index < contacts.length; index++)
+
+        let result = [];
+        for (let index = 0; index < contacts.length; index++)
         {
             if(contacts[index] != null) {
                 result.push(contacts[index]);
@@ -198,7 +199,7 @@
             setContacts();
             //Draw row
             let index = contacts.length - 1;
-            var row = '<tr>' +
+            let row = '<tr>' +
                 '<td>' + contacts[index].id + '</td>' +
                 '<td>' + contacts[index].Name + '</td>' +
                 '<td>' + contacts[index].groupName + '</td>' +
@@ -249,10 +250,10 @@
     //update local
     $("#Update").click(function () {
         let id= $("#updateId").val();
-        var name=$("#updateName").val();
-        var group=$("#updateGroup").val();
-        var phone=$("#updatePhone").val();
-        console.log(id);
+        let name=$("#updateName").val();
+        let group=$("#updateGroup").val();
+        let phone=$("#updatePhone").val();
+        // console.log(id);
         if(name=="" || group=="" || phone==""){
             /**
              * modal alerts
@@ -293,18 +294,20 @@
         else{
             console.log(id);
             //         contacts['#updateId'].id=$("#updateId").val();
-                    contacts[id].id=$("#updateId").val();
-                    contacts[id].name=$("#updateName").val();
-                    contacts[id].groupName=$("#updateGroup").val();
-                    contacts[id].phone=$("#updatePhone").val();
-                    // alert("dfsd");
+            deleteContact(id);
+            contacts.push({
+                id: id,
+                Name: $("#updateName").val(),
+                groupName: $("#updateGroup").val(),
+                phone: $("#updatePhone").val()
+            });
             setContacts();
         }
     });
 
 
 
-    function eleteContact(id){
+    function deleteContact(id){
         console.log(id);
         swal({
             title: "Are you sure?",
@@ -319,10 +322,10 @@
                         icon: "success",
                     });
                     table_body.innerHTML = '';
-                    for (var index = 0; index < contacts.length; index++){
+                    for (let index = 0; index < contacts.length; index++){
                         if(contacts[index] != null && contacts[index].id != id){
                             console.log(id);
-                            var row = '<tr>'+
+                            let row = '<tr>'+
                                 '<td>'+contacts[index].id+'</td>'+
                                 '<td>'+contacts[index].Name+'</td>'+
                                 '<td>'+contacts[index].groupName+'</td>'+

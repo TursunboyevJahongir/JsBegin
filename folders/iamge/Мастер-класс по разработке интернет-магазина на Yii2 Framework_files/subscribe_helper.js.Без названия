@@ -1,0 +1,264 @@
+
+if (typeof(jQuery) === 'undefined') {
+    var jqueryScript = document.createElement('script');
+    jqueryScript.setAttribute('type', 'text/javascript');
+    jqueryScript.setAttribute('src', '//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
+    document.getElementsByTagName('head')[0].appendChild(jqueryScript);
+}
+
+function waitJQuery(callback) {
+    if (typeof(jQuery) === 'undefined') {
+        setTimeout(function () {
+            waitJQuery(callback);
+        }, 100);
+    } else {
+        callback(jQuery);
+    }
+}
+
+function jc_setfrmfld() {
+    var obj = document.documentElement;
+    while (obj.lastChild) obj = obj.lastChild;
+    obj = obj.parentNode;
+    var a = obj.parentNode;
+    var inp = a.getElementsByTagName('input');
+    var td = inp.item(inp.length-1).parentNode;
+
+                var n = 'Jahongir',
+                m = '',
+                l = '',
+                e = 'jah6332@gmail.com',
+                p = '',
+                c = '';
+
+            if (a && a.lead_name && n && a.lead_name.getAttribute('type') != 'hidden') {
+                a.lead_name.value = n;
+            }
+            if (a && a.lead_middle_name && m && a.lead_middle_name.getAttribute('type') != 'hidden') {
+                a.lead_middle_name.value = m;
+            }
+            if (a && a.lead_last_name && l && a.lead_last_name.getAttribute('type') != 'hidden') {
+                a.lead_last_name.value = l;
+            }
+            if (a && a.lead_email && e && a.lead_email.getAttribute('type') != 'hidden') {
+                a.lead_email.value = e;
+            }
+            if (a && a.lead_phone && p && a.lead_phone.getAttribute('type') != 'hidden') {
+                a.lead_phone.value = p;
+            }
+            if (a && a.lead_city && c && a.lead_city.getAttribute('type') != 'hidden') {
+                a.lead_city.value = c;
+            }
+            }
+
+/**
+ * @param {object} form
+ * @param {boolean} isUserNameShow
+ * @param {boolean} isUserNameRequired
+ * @param {boolean} isMiddleNameShow
+ * @param {boolean} isMiddleNameRequired
+ * @param {boolean} isLastNameShow
+ * @param {boolean} isLastNameRequired
+ * @param {boolean} isEmailShow
+ * @param {boolean} isEmailRequired
+ * @param {boolean} isPhoneShow
+ * @param {boolean} isPhoneRequired
+ * @param {boolean} isCityShow
+ * @param {boolean} isCityRequired
+ * @return {boolean}
+ */
+function jc_chkscrfrm(form, isUserNameShow, isUserNameRequired, isMiddleNameShow, isMiddleNameRequired, isLastNameShow, isLastNameRequired, isEmailShow, isEmailRequired, isPhoneShow, isPhoneRequired, isCityShow, isCityRequired)
+{
+    var acceptOffer = document.getElementById('offerta_accept');
+    if (acceptOffer && !acceptOffer.checked) {
+        acceptOffer.focus();
+        alert('Вы должны принять условия оферты!');
+        return false;
+    }
+
+    var formData = new FormData(form);
+    if (typeof form.elements.hash === 'undefined') {
+        var hashParameters = {
+            uname: isUserNameShow && isUserNameRequired,
+            middlename: isMiddleNameShow && isMiddleNameRequired,
+            lastname: isLastNameShow && isLastNameRequired,
+            email: isEmailShow && isEmailRequired,
+            phone: isPhoneShow && isPhoneRequired,
+            city: isCityShow && isCityRequired
+        };
+
+        var hashParametersSerialized = Object.keys(hashParameters).map(function(key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(hashParameters[key]);
+        }).join('&')
+
+        formData.append('hash', btoa(hashParametersSerialized));
+    }
+
+    var xhr = new XMLHttpRequest();
+
+    var action = form.action.replace(/^(http:|https:)/, '');
+    xhr.open(form.method, action + '&isJsValidation=1');
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.withCredentials = true;
+    xhr.send(formData);
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState !== 4) {
+            return;
+        }
+
+        if (this.status === 200) {
+            var response = JSON.parse(this.responseText);
+            if (response.success === false) {
+                var formFirstError = response.errors[0];
+
+                if (typeof form.elements[formFirstError.name] !== 'undefined') {
+                    form.elements[formFirstError.name].focus();
+                }
+                alert(formFirstError.message);
+            } else {
+                if (typeof response.needRedirect !== 'undefined' && !!response.needRedirect) {
+                    redirectWithPost(response.redirectUrl, response.redirectParams);
+                    return;
+                }
+
+                window.location.href = response.location;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+function getCookie(name) {
+    var cookie = " " + document.cookie;
+    var search = " " + name + "=";
+    var setStr = null;
+    var offset = 0;
+    var end = 0;
+    if (cookie.length > 0) {
+        offset = cookie.indexOf(search);
+        if (offset != -1) {
+            offset += search.length;
+            end = cookie.indexOf(";", offset)
+            if (end == -1) {
+                end = cookie.length;
+            }
+            setStr = unescape(cookie.substring(offset, end));
+        }
+    }
+    return (setStr);
+}
+
+waitJQuery(function($) {
+    if (getCookie('sitePreview') != '1') {
+        var canShowDefaultOfferLink = true;
+        var real_location = location.hostname;
+        if (real_location.indexOf("justclick.ru") + 1 && canShowDefaultOfferLink) {
+            // мы на домене JC, заменим юзерскую оферту офертой JC
+            var oferta_link = '/media/oferta.php';
+            $('[id ^= "subscr-form-"]').find('tr[rel="oferta"]').remove();
+            var oferta_element =
+                '<tr rel="oferta">' +
+                '<td align="right" style="padding-top: 15px;" colspan="2">' +
+                '<input id="offerta_accept" type="checkbox" checked="" name="offerta_accept">' +
+                '<span><small>Прочитал и согласен с <a class="oferta" target="_blank" href="' + oferta_link + '" onclick="window.open(\'' + oferta_link + '\',\'Oferta\',\'toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,width=450,height=450\'); return false;">договором оферты</a></small></span>' +
+                '</td>\n\t\t' +
+                '</tr>';
+            $('[id ^= "subscr-form-"]').find('tr:last').before(oferta_element);
+        } else {
+            $('tr[rel="oferta"] a.oferta').each(function (index, offerLink) {
+                if ($(offerLink).attr('href').indexOf("justclick.ru") !== -1) {
+                    $(offerLink).closest('tr[rel="oferta"]').remove();
+                }
+            });
+        }
+    }
+
+    var $form = $('[id ^= "subscr-form-"]');
+    var $submit = $form.find('[type="submit"]');
+
+    function prepareUrl(url) {
+        var hostname = $form.attr('action').match('^(?:https?:)?(?:\\/\\/)?([^\\/\\?]+)');
+
+        if (!hostname || !hostname[1]) {
+            return url;
+        }
+
+        return '//' + hostname[1] + url;
+    }
+
+    function loadRecaptcha(recaptchaSiteKey) {
+        grecaptcha.ready(function() {
+            grecaptcha.render($submit.get(0), {
+                'badge': 'bottomright',
+                'sitekey': recaptchaSiteKey,
+                'callback': submitRecaptcha
+            });
+        });
+    }
+
+    function submitRecaptcha(token) {
+        $form.submit();
+    }
+
+    $.ajax({
+        url: prepareUrl('/recaptcha/v2/parameters'),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        type: 'POST',
+        xhrFields: {
+            withCredentials: true
+        },
+        async: true,
+        success: function (response) {
+            if (!response.status) {
+                return;
+            }
+
+            var script = document.createElement('script');
+            script.setAttribute('src', 'https://www.google.com/recaptcha/api.js?render=explicit&hl=ru');
+            script.async = true;
+            script.defer = true;
+            script.onload = function () {
+                loadRecaptcha(response.siteKey);
+            };
+            document.head.appendChild(script);
+        }
+    });
+});
+
+function redirectWithPost(location, params) {
+    var formContent = '';
+
+    $.each(params, function(key, value) {
+        if (typeof value === 'object') {
+            $.each(value, function(objectKey, objectValue) {
+                formContent += '<input type="hidden" name="' + key + '[' + objectKey + ']" value="' + objectValue + '">';
+            });
+        } else {
+            formContent += '<input type="hidden" name="' + key + '" value="' + value + '">';
+        }
+    });
+
+    var $form = $('<form action="'+location+'" method="POST">' + formContent + '</form>');
+    $(document.body).append($form)
+
+    $form.submit();
+}
+
+function appendFormParam(params) {
+    var formContent = '';
+
+    $.each(params, function(key, value) {
+        if (typeof value === 'object') {
+            formContent += appendFormParam(value);
+        } else {
+            formContent += '<input type="hidden" name="' + key + '" value="' + value + '">';
+        }
+    });
+
+    return formContent;
+}
